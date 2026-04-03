@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: shelter-now-backend
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
