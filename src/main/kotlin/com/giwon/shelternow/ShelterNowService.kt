@@ -31,21 +31,26 @@ class ShelterNowService {
         query: String?,
         shelterType: String?,
         district: String?,
+        openStatus: String?,
+        sortBy: String,
         latitude: Double?,
         longitude: Double?,
     ): List<ShelterSummary> {
         val normalizedQuery = query?.trim().orEmpty()
         val normalizedType = shelterType?.trim().orEmpty()
         val normalizedDistrict = district?.trim().orEmpty()
+        val normalizedStatus = openStatus?.trim().orEmpty()
+        val normalizedSort = sortBy.trim().lowercase()
 
-        return shelters
+        val results = shelters
             .filter {
                 val matchesQuery = normalizedQuery.isBlank() ||
                     it.shelterName.contains(normalizedQuery, ignoreCase = true) ||
                     it.address.contains(normalizedQuery, ignoreCase = true)
                 val matchesType = normalizedType.isBlank() || it.shelterType == normalizedType
                 val matchesDistrict = normalizedDistrict.isBlank() || it.district == normalizedDistrict
-                matchesQuery && matchesType && matchesDistrict
+                val matchesStatus = normalizedStatus.isBlank() || it.openStatus == normalizedStatus
+                matchesQuery && matchesType && matchesDistrict && matchesStatus
             }
             .map {
                 val distance = if (latitude != null && longitude != null) {
@@ -55,7 +60,17 @@ class ShelterNowService {
                 }
                 it.toSummary(distance)
             }
-            .sortedWith(compareBy<ShelterSummary> { it.distanceMeters ?: Int.MAX_VALUE }.thenBy { it.shelterName })
+
+        return when (normalizedSort) {
+            "capacity" -> results.sortedWith(
+                compareByDescending<ShelterSummary> { it.capacity }
+                    .thenBy { it.distanceMeters ?: Int.MAX_VALUE }
+                    .thenBy { it.shelterName },
+            )
+
+            "name" -> results.sortedBy { it.shelterName }
+            else -> results.sortedWith(compareBy<ShelterSummary> { it.distanceMeters ?: Int.MAX_VALUE }.thenBy { it.shelterName })
+        }
     }
 
     fun getShelterMap(): List<ShelterMapGroup> {

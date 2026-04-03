@@ -16,10 +16,12 @@ class ShelterNowController(
         @RequestParam(required = false) query: String?,
         @RequestParam(required = false) shelterType: String?,
         @RequestParam(required = false) district: String?,
+        @RequestParam(required = false) openStatus: String?,
+        @RequestParam(required = false, defaultValue = "distance") sortBy: String,
         @RequestParam(required = false) latitude: Double?,
         @RequestParam(required = false) longitude: Double?,
     ): ApiResponse<List<ShelterSummary>> = ApiResponse.ok(
-        shelterNowService.searchShelters(query, shelterType, district, latitude, longitude),
+        shelterNowService.searchShelters(query, shelterType, district, openStatus, sortBy, latitude, longitude),
     )
 
     @GetMapping("/shelters/map")
