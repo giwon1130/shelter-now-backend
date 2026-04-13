@@ -22,6 +22,23 @@
 - `GET /api/v1/shelters/map`
 - `GET /api/v1/shelters/{shelterId}`
 
+## 로컬 실행
+```bash
+./gradlew bootRun --args='--server.port=8086'
+```
+
+- 기본 개발 포트는 `8086` 기준으로 맞춘다.
+- 프론트 로컬 프록시는 `http://127.0.0.1:8086`을 바라본다.
+
+## Docker
+```bash
+docker build -t shelter-now-backend .
+docker run -p 8086:8086 shelter-now-backend
+```
+
+- actuator health: `http://localhost:8086/actuator/health`
+- 컨테이너 이미지에는 healthcheck용 `wget`을 포함했다.
+
 ## 다음 단계
 - 전국 단위 원본 대피소/쉼터 데이터 수집 및 적재 파이프라인 구축 (다음 단계)
 - 전국 데이터 정규화(행정구역/좌표/운영 상태) 후 조회 API 전환
